@@ -4,26 +4,26 @@
 - [x] Public repository created
 - [x] Scope and data integrity principles documented
 - [x] Secret-safe environment template and ignore rules
-- [ ] Application scaffold and CI checks
+- [x] Application scaffold and CI checks
 
 ## Phase 1 — Core web application
-- [ ] Responsive app shell and navigation
-- [ ] Market watchlist and instrument model
-- [ ] Data-source health and freshness indicators
-- [ ] Accessible chart workspace
+- [x] Responsive app shell and navigation
+- [x] Market watchlist and instrument model
+- [x] Data-source health and freshness indicators
+- [x] Accessible chart workspace
 
 ## Phase 2 — Verified market data
-- [ ] Crypto public REST adapter
-- [ ] Crypto WebSocket adapter and reconnect handling
-- [ ] Candle normalization and validation
-- [ ] Provider attribution and outage behavior
+- [x] Crypto public REST adapter
+- [x] Crypto WebSocket adapter and reconnect handling
+- [x] Candle normalization and validation
+- [x] Provider attribution and outage behavior
 - [ ] OTC provider feasibility review; integrate only if terms and data are verified
 
 ## Phase 3 — Deterministic analysis
-- [ ] Technical indicators with unit tests
+- [x] Technical indicators with unit tests
 - [ ] Multi-timeframe analysis
-- [ ] Price action and market structure
-- [ ] Configurable confluence and explainable rejection reasons
+- [x] Price action and market structure
+- [x] Initial gated confluence evaluator and explainable rejection reasons
 
 ## Phase 4 — Risk and research
 - [ ] Risk/reward and position sizing calculator
