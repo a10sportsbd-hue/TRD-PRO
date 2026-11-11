@@ -17,7 +17,7 @@ These are heuristic observations, not institutional order-flow facts. A three-ca
 
 ## Confluence rules
 
-The evaluator counts up to six directional observations:
+The evaluator counts up to five directional observations:
 - EMA20 versus EMA50
 - RSI14 directional band (extreme readings are not counted)
 - MACD histogram sign
