@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { MarketCandlestickChart } from "./components/MarketCandlestickChart";
+import { useBinanceMarketData } from "./market/useBinanceMarketData";
+import type { MarketInterval } from "./market/types";
 import {
   Activity, ArrowUpRight, Bell, BookOpen, ChartCandlestick,
   ChevronDown, Command, Compass, Cpu, Crosshair, LayoutDashboard,
@@ -25,6 +28,11 @@ function App() {
   const [activeNav, setActiveNav] = useState("Overview");
 
   const selected = watchlist.find((item) => item.symbol === activePair) ?? watchlist[0];
+  const interval = (timeframe === "1D" ? "1d" : timeframe) as MarketInterval;
+  const marketData = useBinanceMarketData(`${activePair}USDT`, interval, marketTab === "Crypto");
+  const latestCandle = marketData.candles[marketData.candles.length - 1];
+  const formattedPrice = latestCandle ? latestCandle.close.toLocaleString("en-US", { maximumFractionDigits: 8 }) : "— — —";
+  const feedLabel = marketTab === "OTC" ? "OTC FEED UNSUPPORTED" : marketData.status === "LIVE" ? "BINANCE SPOT · LIVE" : marketData.status.replace("_", " ");
 
   const navItems = [
     { label: "Overview", icon: LayoutDashboard },
@@ -102,8 +110,8 @@ function App() {
           <section className="status-banner">
             <div className="status-symbol"><Activity size={19} /></div>
             <div className="status-message">
-              <strong>Market data is not connected yet</strong>
-              <span>Connect a trusted provider to load live prices, candles, indicators and analysis.</span>
+              <strong>{marketData.status === "LIVE" ? "Verified Binance Spot market feed connected" : marketTab === "OTC" ? "No verified OTC provider configured" : marketData.status === "ERROR" ? "Unable to load Binance market data" : marketData.status === "STALE" ? "Market feed is stale" : "Connecting to Binance public market data"}</strong>
+              <span>{marketData.error ?? "Public Spot prices only. No account API key or trading permission is used."}</span>
             </div>
             <button className="connect-button" onClick={() => setActiveNav("Data Sources")}>Configure data source <ArrowUpRight size={15} /></button>
           </section>
@@ -111,8 +119,8 @@ function App() {
           <section className="metric-grid">
             <div className="metric-card">
               <div className="metric-head"><span>MARKET STATUS</span><Activity size={16} /></div>
-              <div className="metric-value status-value"><i /> Awaiting feed</div>
-              <div className="metric-foot">No validated market stream</div>
+              <div className="metric-value status-value"><i /> {marketData.status}</div>
+              <div className="metric-foot">{marketData.status === "LIVE" ? "Binance Spot stream validated" : "No validated live stream"}</div>
             </div>
             <div className="metric-card">
               <div className="metric-head"><span>ACTIVE SIGNALS</span><Crosshair size={16} /></div>
@@ -137,7 +145,7 @@ function App() {
                 <div>
                   <div className="panel-kicker">PRICE ACTION</div>
                   <div className="instrument-title"><strong>{selected.symbol}</strong><span>{selected.pair}</span><span className="market-pill">{marketTab === "Crypto" ? "CRYPTO SPOT" : "OTC"}</span></div>
-                  <div className="price-placeholder">— — — <span>Live price unavailable</span></div>
+                  <div className="price-placeholder">{marketTab === "Crypto" ? formattedPrice : "— — —"} <span>{marketData.status === "LIVE" ? "USDT · live spot price" : "Live price unavailable"}</span></div>
                 </div>
                 <div className="chart-controls">
                   <div className="timeframe-control">
@@ -153,18 +161,18 @@ function App() {
                   <button className={marketTab === "Crypto" ? "active" : ""} onClick={() => setMarketTab("Crypto")}>Crypto</button>
                   <button className={marketTab === "OTC" ? "active" : ""} onClick={() => setMarketTab("OTC")}>OTC</button>
                 </div>
-                <span className="feed-label"><i /> NO VERIFIED FEED</span>
+                <span className="feed-label"><i /> {feedLabel}</span>
               </div>
-              <div className="chart-empty">
+              {marketData.candles.length > 0 && marketTab === "Crypto" ? <MarketCandlestickChart candles={marketData.candles} /> : <div className="chart-empty">
                 <div className="empty-chart-icon"><ChartCandlestick size={27} /></div>
-                <strong>No candle data available</strong>
-                <p>Connect a verified {marketTab === "Crypto" ? "crypto exchange" : "OTC data provider"} to display the {timeframe} chart.</p>
-                <span className="empty-state-code">DATA STATUS: NO_DATA</span>
-              </div>
+                <strong>{marketTab === "OTC" ? "OTC data source not configured" : marketData.status === "ERROR" ? "Market data unavailable" : "Waiting for verified candles"}</strong>
+                <p>{marketTab === "OTC" ? "No official broker OTC feed is integrated. OTC chart remains unavailable." : marketData.error ?? `Loading real Binance Spot ${timeframe} candles. No generated chart data is used.`}</p>
+                <span className="empty-state-code">DATA STATUS: {marketData.status}</span>
+              </div>}
               <div className="chart-footer">
-                <span>Source: <b>Not connected</b></span>
-                <span>Last update: <b>—</b></span>
-                <span>Chart engine: <b>Ready</b></span>
+                <span>Source: <b>{marketTab === "Crypto" && marketData.candles.length ? "Binance Spot public data" : "Not connected"}</b></span>
+                <span>Last update: <b>{marketData.lastUpdated ? new Date(marketData.lastUpdated).toLocaleTimeString() : "—"}</b></span>
+                <span>Chart engine: <b>Lightweight Charts</b></span>
               </div>
             </div>
 
@@ -179,7 +187,7 @@ function App() {
                   <button key={item.symbol} className={`watch-item ${activePair === item.symbol ? "watch-active" : ""}`} onClick={() => setActivePair(item.symbol)}>
                     <span className={`coin-icon coin-${item.symbol.toLowerCase()}`}>{item.symbol.slice(0, 1)}</span>
                     <span className="coin-copy"><strong>{item.symbol}</strong><small>{item.name}</small></span>
-                    <span className="coin-price"><strong>—</strong><small>NO DATA</small></span>
+                    <span className="coin-price"><strong>{item.symbol === activePair && marketData.status === "LIVE" && latestCandle ? latestCandle.close.toLocaleString("en-US", { maximumFractionDigits: 6 }) : "—"}</strong><small>{item.symbol === activePair && marketData.status === "LIVE" ? "LIVE · USDT" : "NO DATA"}</small></span>
                   </button>
                 ))}
               </div>
