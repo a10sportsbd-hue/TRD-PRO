@@ -70,11 +70,12 @@ describe("market structure observations", () => {
   });
 
   it("detects a three-candle bullish fair value gap", () => {
-    const candles = [
-      candle(0, 100, 101, 99, 100),
-      candle(1, 100, 105, 100, 104),
-      candle(2, 106, 108, 105, 107),
-    ];
+    const candles = risingCandles(17);
+    candles.push(
+      candle(17, 100, 101, 99, 100),
+      candle(18, 100, 105, 100, 104),
+      candle(19, 106, 108, 105, 107),
+    );
     const result = analyzeMarketStructure(candles, 1);
     expect(result.fvg?.direction).toBe("BULLISH");
     expect(result.fvg?.low).toBe(101);
