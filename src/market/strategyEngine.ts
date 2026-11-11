@@ -51,7 +51,7 @@ function emptyAnalysis(input: StrategyInput, reason: string, now: number): Strat
     reason,
     reasons: [reason],
     confluenceScore: 0,
-    confluenceMaximum: 6,
+    confluenceMaximum: 5,
     scoreIsProbability: false,
     source: "BINANCE_SPOT",
     symbol: input.symbol,
