@@ -49,7 +49,10 @@ export function useBinanceMarketData(symbol: string, interval: MarketInterval, e
         socket = createKlineSocket(symbol, interval, mergeCandle, (status) => {
           if (disposed) return;
           if (status === "OPEN") reconnectAttempt = 0;
-          if (status === "ERROR" || status === "CLOSED") {
+          if (status === "ERROR") {
+            setState((previous) => ({ ...previous, status: previous.candles.length ? "STALE" : "CONNECTING" }));
+          }
+          if (status === "CLOSED") {
             setState((previous) => ({ ...previous, status: previous.candles.length ? "STALE" : "CONNECTING" }));
             const delay = Math.min(1000 * 2 ** reconnectAttempt, 30_000);
             reconnectAttempt += 1;
@@ -65,7 +68,7 @@ export function useBinanceMarketData(symbol: string, interval: MarketInterval, e
       .then((candles) => {
         if (disposed) return;
         const latest = candles[candles.length - 1];
-        setState({ candles, status: latest ? "LIVE" : "NO_DATA", lastUpdated: latest?.receivedAt ?? null, error: null });
+        setState({ candles, status: latest ? "CONNECTING" : "NO_DATA", lastUpdated: latest?.receivedAt ?? null, error: null });
       })
       .catch((error: unknown) => {
         if (disposed || (error instanceof DOMException && error.name === "AbortError")) return;
