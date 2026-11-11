@@ -38,7 +38,7 @@ Never commit API keys, tokens, passwords, private account data, or production se
 
 ## Development status
 
-This repository currently contains project documentation and secure configuration templates. Application code, integrations, and signal calculations will be added incrementally with tests and source-backed data adapters.
+The initial React + Vite + TypeScript dashboard scaffold is now committed. The UI includes responsive navigation, crypto/OTC workspace switching, timeframe controls, watchlist selection, data-source entry points, signal gating, and AI analyst placeholders. No market feed or signal engine is connected yet; the interface intentionally displays NO DATA until a verified provider adapter is implemented.
 
 ## Disclaimer
 
