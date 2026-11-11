@@ -4,6 +4,7 @@ import { useBinanceMarketData } from "./market/useBinanceMarketData";
 import type { MarketInterval } from "./market/types";
 import { calculateIndicators, formatIndicator } from "./market/indicators";
 import { useBinanceTicker } from "./market/useBinanceTicker";
+import { evaluateStrategy } from "./market/strategyEngine";
 import {
   Activity, ArrowUpRight, Bell, BookOpen, ChartCandlestick,
   ChevronDown, Command, Compass, Cpu, Crosshair, LayoutDashboard,
@@ -35,6 +36,12 @@ function App() {
   const latestCandle = marketData.candles[marketData.candles.length - 1];
   const tickerData = useBinanceTicker();
   const indicators = calculateIndicators(marketData.candles);
+  const strategy = evaluateStrategy({
+    candles: marketData.candles.filter((candle) => candle.closed),
+    feedStatus: marketData.status,
+    symbol: `${activePair}USDT`,
+    interval,
+  });
   const formattedPrice = selectedTicker ? selectedTicker.lastPrice.toLocaleString("en-US", { maximumFractionDigits: 8 }) : latestCandle ? latestCandle.close.toLocaleString("en-US", { maximumFractionDigits: 8 }) : "— — —";
   const feedLabel = marketTab === "OTC" ? "OTC FEED UNSUPPORTED" : marketData.status === "LIVE" ? "BINANCE SPOT · LIVE" : marketData.status.replace("_", " ");
 
@@ -209,13 +216,25 @@ function App() {
           <section className="bottom-grid">
             <div className="panel signal-panel">
               <div className="panel-heading">
-                <div><div className="panel-kicker">DECISION SUPPORT</div><h2>Signal center</h2></div>
-                <span className="disabled-pill"><i /> SIGNALS DISABLED</span>
+                <div><div className="panel-kicker">RESEARCH ENGINE</div><h2>Strategy analysis</h2></div>
+                <span className="disabled-pill"><i /> {strategy.status === "BLOCKED" ? "VALIDATION BLOCKED" : "RESEARCH ONLY"}</span>
               </div>
               <div className="signal-empty">
                 <div className="signal-lock"><ShieldCheck size={20} /></div>
-                <div><strong>No actionable signals</strong><p>Signal evaluation unlocks only when fresh, complete and validated candles are available.</p></div>
+                <div>
+                  <strong>{strategy.status === "BLOCKED" ? "No validated analysis" : strategy.direction === "WAIT" ? "No directional setup" : `${strategy.direction} research candidate · not a trade signal`}</strong>
+                  <p>{strategy.reason}</p>
+                </div>
               </div>
+              <div className="strategy-meta">
+                <span>Confluence <b>{strategy.confluenceScore}/{strategy.confluenceMaximum}</b></span>
+                <span>Closed candles <b>{strategy.candleCount}</b></span>
+                <span>Source <b>{marketTab === "Crypto" ? "Binance Spot" : "Unsupported OTC"}</b></span>
+              </div>
+              <div className="strategy-reasons">
+                {strategy.reasons.slice(0, 3).map((reason) => <div key={reason}>• {reason}</div>)}
+              </div>
+              <div className="strategy-disclaimer">Research candidate only. No entry, SL, TP or execution instruction. Confluence is not win probability.</div>
             </div>
             <div className="panel assistant-panel">
               <div className="panel-heading">
