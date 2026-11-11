@@ -75,6 +75,9 @@ function macd(values: number[]) {
   let fastEma = mean(values.slice(0, fast));
   let slowEma = mean(values.slice(0, slow));
   const lineValues: number[] = [];
+  for (let index = fast; index < slow; index += 1) {
+    fastEma = (values[index] - fastEma) * multiplierFast + fastEma;
+  }
   for (let index = slow; index < values.length; index += 1) {
     fastEma = (values[index] - fastEma) * multiplierFast + fastEma;
     slowEma = (values[index] - slowEma) * multiplierSlow + slowEma;
