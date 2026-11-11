@@ -35,7 +35,6 @@ function App() {
   const latestCandle = marketData.candles[marketData.candles.length - 1];
   const tickerData = useBinanceTicker();
   const indicators = calculateIndicators(marketData.candles);
-  const selectedTicker = tickerData.items[`${activePair}USDT`];
   const formattedPrice = selectedTicker ? selectedTicker.lastPrice.toLocaleString("en-US", { maximumFractionDigits: 8 }) : latestCandle ? latestCandle.close.toLocaleString("en-US", { maximumFractionDigits: 8 }) : "— — —";
   const feedLabel = marketTab === "OTC" ? "OTC FEED UNSUPPORTED" : marketData.status === "LIVE" ? "BINANCE SPOT · LIVE" : marketData.status.replace("_", " ");
 
