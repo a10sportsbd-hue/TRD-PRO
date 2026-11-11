@@ -8,3 +8,7 @@
 
 .live-chart{height:330px;width:100%;overflow:hidden;background:#0d141e;border-bottom:1px solid #202a38}.feed-label{white-space:nowrap}.status-message span{max-width:850px}
 @media(max-width:560px){.live-chart{height:260px}}
+
+.indicator-strip{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;padding:11px 0;border-bottom:1px solid #202a38}.indicator-strip>div{min-width:0}.indicator-strip span,.indicator-strip strong{display:block}.indicator-strip span{font:8px var(--mono);color:#718096;letter-spacing:.5px}.indicator-strip strong{font:10px var(--mono);color:#b8c7dc;margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.coin-price small{color:#7eb89f}.coin-price small:contains("NO DATA"){color:#c79e5e}
+@media(max-width:560px){.indicator-strip{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:11px}.indicator-strip strong{font-size:9px}}
