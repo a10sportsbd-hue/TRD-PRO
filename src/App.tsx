@@ -2,6 +2,8 @@ import { useState } from "react";
 import { MarketCandlestickChart } from "./components/MarketCandlestickChart";
 import { useBinanceMarketData } from "./market/useBinanceMarketData";
 import type { MarketInterval } from "./market/types";
+import { calculateIndicators, formatIndicator } from "./market/indicators";
+import { useBinanceTicker } from "./market/useBinanceTicker";
 import {
   Activity, ArrowUpRight, Bell, BookOpen, ChartCandlestick,
   ChevronDown, Command, Compass, Cpu, Crosshair, LayoutDashboard,
@@ -31,7 +33,10 @@ function App() {
   const interval = (timeframe === "1D" ? "1d" : timeframe) as MarketInterval;
   const marketData = useBinanceMarketData(`${activePair}USDT`, interval, marketTab === "Crypto");
   const latestCandle = marketData.candles[marketData.candles.length - 1];
-  const formattedPrice = latestCandle ? latestCandle.close.toLocaleString("en-US", { maximumFractionDigits: 8 }) : "— — —";
+  const tickerData = useBinanceTicker();
+  const indicators = calculateIndicators(marketData.candles);
+  const selectedTicker = tickerData.items[`${activePair}USDT`];
+  const formattedPrice = selectedTicker ? selectedTicker.lastPrice.toLocaleString("en-US", { maximumFractionDigits: 8 }) : latestCandle ? latestCandle.close.toLocaleString("en-US", { maximumFractionDigits: 8 }) : "— — —";
   const feedLabel = marketTab === "OTC" ? "OTC FEED UNSUPPORTED" : marketData.status === "LIVE" ? "BINANCE SPOT · LIVE" : marketData.status.replace("_", " ");
 
   const navItems = [
@@ -129,8 +134,8 @@ function App() {
             </div>
             <div className="metric-card">
               <div className="metric-head"><span>WATCHLIST</span><Compass size={16} /></div>
-              <div className="metric-value">{watchlist.length} <small>instruments</small></div>
-              <div className="metric-foot">Symbols configured · prices unavailable</div>
+              <div className="metric-value">{Object.keys(tickerData.items).length} <small>/ {watchlist.length} live</small></div>
+              <div className="metric-foot">Binance Spot 24h ticker coverage</div>
             </div>
             <div className="metric-card">
               <div className="metric-head"><span>AI ANALYST</span><Cpu size={16} /></div>
@@ -161,7 +166,7 @@ function App() {
                   <button className={marketTab === "Crypto" ? "active" : ""} onClick={() => setMarketTab("Crypto")}>Crypto</button>
                   <button className={marketTab === "OTC" ? "active" : ""} onClick={() => setMarketTab("OTC")}>OTC</button>
                 </div>
-                <span className="feed-label"><i /> {feedLabel}</span>
+                <span className="feed-label"><i /> {marketTab === "Crypto" ? feedLabel : "OTC FEED UNSUPPORTED"}</span>
               </div>
               {marketData.candles.length > 0 && marketTab === "Crypto" ? <MarketCandlestickChart candles={marketData.candles} /> : <div className="chart-empty">
                 <div className="empty-chart-icon"><ChartCandlestick size={27} /></div>
@@ -169,6 +174,13 @@ function App() {
                 <p>{marketTab === "OTC" ? "No official broker OTC feed is integrated. OTC chart remains unavailable." : marketData.error ?? `Loading real Binance Spot ${timeframe} candles. No generated chart data is used.`}</p>
                 <span className="empty-state-code">DATA STATUS: {marketData.status}</span>
               </div>}
+              <div className="indicator-strip">
+                <div><span>EMA 20</span><strong>{formatIndicator(indicators.ema20)}</strong></div>
+                <div><span>EMA 50</span><strong>{formatIndicator(indicators.ema50)}</strong></div>
+                <div><span>RSI 14</span><strong>{formatIndicator(indicators.rsi14, 2)}</strong></div>
+                <div><span>MACD</span><strong>{formatIndicator(indicators.macd, 5)}</strong></div>
+                <div><span>ATR 14</span><strong>{formatIndicator(indicators.atr14)}</strong></div>
+              </div>
               <div className="chart-footer">
                 <span>Source: <b>{marketTab === "Crypto" && marketData.candles.length ? "Binance Spot public data" : "Not connected"}</b></span>
                 <span>Last update: <b>{marketData.lastUpdated ? new Date(marketData.lastUpdated).toLocaleTimeString() : "—"}</b></span>
@@ -187,11 +199,11 @@ function App() {
                   <button key={item.symbol} className={`watch-item ${activePair === item.symbol ? "watch-active" : ""}`} onClick={() => setActivePair(item.symbol)}>
                     <span className={`coin-icon coin-${item.symbol.toLowerCase()}`}>{item.symbol.slice(0, 1)}</span>
                     <span className="coin-copy"><strong>{item.symbol}</strong><small>{item.name}</small></span>
-                    <span className="coin-price"><strong>{item.symbol === activePair && marketData.status === "LIVE" && latestCandle ? latestCandle.close.toLocaleString("en-US", { maximumFractionDigits: 6 }) : "—"}</strong><small>{item.symbol === activePair && marketData.status === "LIVE" ? "LIVE · USDT" : "NO DATA"}</small></span>
+                    <span className="coin-price"><strong>{tickerData.items[`${item.symbol}USDT`]?.lastPrice.toLocaleString("en-US", { maximumFractionDigits: 6 }) ?? "—"}</strong><small>{tickerData.items[`${item.symbol}USDT`] ? `${tickerData.items[`${item.symbol}USDT`].priceChangePercent >= 0 ? "+" : ""}${tickerData.items[`${item.symbol}USDT`].priceChangePercent.toFixed(2)}% · 24H` : "NO DATA"}</small></span>
                   </button>
                 ))}
               </div>
-              <div className="watchlist-note"><ShieldCheck size={14} /> Prices appear only after source validation.</div>
+              <div className="watchlist-note"><ShieldCheck size={14} /> {tickerData.status === "LIVE" ? "Live Binance Spot 24h ticker · verified source" : `Ticker feed: ${tickerData.status}`}</div>
             </div>
           </section>
 
