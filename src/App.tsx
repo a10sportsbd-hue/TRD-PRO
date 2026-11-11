@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {
-  Activity, ArrowDownRight, ArrowUpRight, Bell, BookOpen, ChartCandlestick,
-  ChevronDown, CircleHelp, Command, Compass, Cpu, Crosshair, LayoutDashboard,
+  Activity, ArrowUpRight, Bell, BookOpen, ChartCandlestick,
+  ChevronDown, Command, Compass, Cpu, Crosshair, LayoutDashboard,
   Menu, Search, Settings2, ShieldCheck, SlidersHorizontal, Sparkles, Wallet,
   X
 } from "lucide-react";
