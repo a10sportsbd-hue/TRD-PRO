@@ -6,6 +6,7 @@ import { calculateIndicators, formatIndicator } from "./market/indicators";
 import { useBinanceTicker } from "./market/useBinanceTicker";
 import { evaluateStrategy } from "./market/strategyEngine";
 import { RiskCalculator } from "./components/RiskCalculator";
+import { WorkspaceSettings } from "./components/WorkspaceSettings";
 import { SettingsPage } from "./components/SettingsPage";
 import {
   Activity, ArrowUpRight, Bell, BookOpen, ChartCandlestick,
@@ -31,6 +32,7 @@ function App() {
   const [activePair, setActivePair] = useState("BTC");
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeNav, setActiveNav] = useState("Overview");
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const selected = watchlist.find((item) => item.symbol === activePair) ?? watchlist[0];
   const interval = (timeframe === "1D" ? "1d" : timeframe) as MarketInterval;
@@ -77,8 +79,8 @@ function App() {
         <div className="sidebar-divider" />
         <div className="workspace-label">TOOLS</div>
         <button className="nav-item" onClick={() => setActiveNav("Risk Calculator")}><Wallet size={18} /><span>Risk Calculator</span></button>
-        <button className="nav-item" onClick={() => setActiveNav("Data Sources")}><Activity size={18} /><span>Data Sources</span></button>
-        <button className="nav-item" onClick={() => setActiveNav("Settings")}><Settings2 size={18} /><span>Settings</span></button>
+        <button className="nav-item" onClick={() => { setActiveNav("Data Sources"); setSettingsOpen(true); }}><Activity size={18} /><span>Data Sources</span></button>
+        <button className="nav-item" onClick={() => { setActiveNav("Settings"); setSettingsOpen(true); }}><Settings2 size={18} /><span>Settings</span></button>
 
         <div className="sidebar-bottom">
           <div className="secure-card">
@@ -96,6 +98,8 @@ function App() {
       </aside>
 
       {menuOpen && <button className="mobile-scrim" aria-label="Close navigation" onClick={() => setMenuOpen(false)} />}
+
+      {settingsOpen && <WorkspaceSettings onClose={() => setSettingsOpen(false)} />}
 
       <main className="main-content">
         <header className="topbar">
