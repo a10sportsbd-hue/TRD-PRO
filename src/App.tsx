@@ -8,6 +8,7 @@ import { evaluateStrategy } from "./market/strategyEngine";
 import { RiskCalculator } from "./components/RiskCalculator";
 import { WorkspaceSettings } from "./components/WorkspaceSettings";
 import { SettingsPage } from "./components/SettingsPage";
+import { LiveMarketScanner } from "./components/LiveMarketScanner";
 import {
   Activity, ArrowUpRight, Bell, BookOpen, ChartCandlestick,
   ChevronDown, Command, Compass, Cpu, Crosshair, LayoutDashboard,
@@ -133,6 +134,8 @@ function App() {
             </div>
             <button className="connect-button" onClick={() => setActiveNav("Data Sources")}>Configure data source <ArrowUpRight size={15} /></button>
           </section>
+
+          <LiveMarketScanner />
 
           <section className="metric-grid">
             <div className="metric-card">
