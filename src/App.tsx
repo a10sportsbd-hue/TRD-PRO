@@ -6,6 +6,7 @@ import { calculateIndicators, formatIndicator } from "./market/indicators";
 import { useBinanceTicker } from "./market/useBinanceTicker";
 import { evaluateStrategy } from "./market/strategyEngine";
 import { RiskCalculator } from "./components/RiskCalculator";
+import { SettingsPage } from "./components/SettingsPage";
 import {
   Activity, ArrowUpRight, Bell, BookOpen, ChartCandlestick,
   ChevronDown, Command, Compass, Cpu, Crosshair, LayoutDashboard,
@@ -252,6 +253,8 @@ function App() {
           </section>
 
           <section className="panel risk-panel"><RiskCalculator /></section>
+
+          {activeNav === "Settings" && <SettingsPage onBack={() => setActiveNav("Overview")} />}
 
           <footer className="app-footer">
             <span>TRD PRO <b>v0.1.0</b></span>
