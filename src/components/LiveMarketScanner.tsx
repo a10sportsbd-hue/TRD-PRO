@@ -3,7 +3,7 @@ import { Activity, AlertTriangle, Play, RefreshCw, ShieldCheck, TrendingDown, Tr
 import { evaluateStrategy, type StrategyAnalysis } from "../market/strategyEngine";
 import type { Candle, MarketInterval } from "../market/types";
 
-type ScanRow = { symbol: string; analysis?: StrategyAnalysis; error?: string };
+type ScanRow = { symbol: string; analysis?: StrategyAnalysis; lastClose?: number; error?: string };
 const SYMBOLS = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT"];
 const INTERVALS: MarketInterval[] = ["1m", "5m", "15m", "1h", "4h", "1d"];
 
@@ -29,7 +29,7 @@ async function scanSymbol(symbol: string, interval: MarketInterval): Promise<Sca
     };
   }).filter(c => c.closed);
   const analysis = evaluateStrategy({ candles, feedStatus: "LIVE", symbol, interval, now });
-  return { symbol, analysis };
+  return { symbol, analysis, lastClose: candles[candles.length - 1]?.close };
 }
 
 function money(value: number | null | undefined) {
@@ -70,7 +70,7 @@ export function LiveMarketScanner() {
     {!rows.length && !busy && <div className="scanner-empty"><Activity size={24}/><strong>Scanner is ready</strong><span>Tap Start live scan to fetch fresh closed candles and calculate technical confluence.</span></div>}
     {busy && <div className="scanner-progress">Requesting live OHLCV data from Binance Spot for five markets. No sample candles are used.</div>}
     {!!rows.length && <div className="scanner-table-wrap"><table className="scanner-table"><thead><tr><th>MARKET</th><th>LAST CLOSE</th><th>BIAS</th><th>CONFLUENCE</th><th>RSI</th><th>STATUS</th></tr></thead><tbody>
-      {rows.map(row=>{const a=row.analysis;const d=a?.direction;return <tr key={row.symbol}><td><strong>{row.symbol.replace("USDT","")}</strong><small>USDT · Binance Spot</small></td><td>{money(a?.indicators.ema20 != null && a.candleCount ? undefined : undefined)}{a ? money(a.indicators.ema20) : "—"}</td><td><span className={d==="BUY"?"bias-buy":d==="SELL"?"bias-sell":"bias-wait"}>{d==="BUY"?<TrendingUp size={13}/>:d==="SELL"?<TrendingDown size={13}/>:null}{d ?? "NO DATA"}</span></td><td>{a ? `${a.confluenceScore}/5` : "—"}</td><td>{a?.indicators.rsi14?.toFixed(1) ?? "—"}</td><td>{row.error ? <span className="scan-fail">{row.error}</span> : <span className="scan-ok"><ShieldCheck size={12}/>{a?.status}</span>}</td></tr>})}
+      {rows.map(row=>{const a=row.analysis;const d=a?.direction;return <tr key={row.symbol}><td><strong>{row.symbol.replace("USDT","")}</strong><small>USDT · Binance Spot</small></td><td>{row.lastClose != null ? money(row.lastClose) : "—"}</td><td><span className={d==="BUY"?"bias-buy":d==="SELL"?"bias-sell":"bias-wait"}>{d==="BUY"?<TrendingUp size={13}/>:d==="SELL"?<TrendingDown size={13}/>:null}{d ?? "NO DATA"}</span></td><td>{a ? `${a.confluenceScore}/5` : "—"}</td><td>{a?.indicators.rsi14?.toFixed(1) ?? "—"}</td><td>{row.error ? <span className="scan-fail">{row.error}</span> : <span className="scan-ok"><ShieldCheck size={12}/>{a?.status}</span>}</td></tr>})}
     </tbody></table></div>}
     {!!rows.length && <div className="scanner-notes">{rows.map(r=><div key={r.symbol}><strong>{r.symbol}</strong>: {r.error ?? r.analysis?.reason}</div>)}</div>}
     <div className="scanner-foot"><span>Source: Binance public Spot REST API</span><span>Last scan: {lastScan ? new Date(lastScan).toLocaleTimeString() : "Not run"}</span><span>Rule count is not win probability. Analysis only.</span></div>
