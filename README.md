@@ -2,44 +2,59 @@
 
 **Trade Smarter. Analyze Deeper.**
 
-TRD Pro is a multi-platform trading analysis and decision-support platform for cryptocurrency markets and carefully validated OTC data integrations. It is planned to combine market-data ingestion, technical analysis, strategy confluence, risk analytics, explainable AI assistance, backtesting, and trade journaling.
+TRD Pro is a market-analysis and decision-support application. The current implementation includes a responsive React + TypeScript dashboard, verified Binance Spot market data, technical indicators, a gated research engine, and a manual risk calculator.
 
-> **Project status:** Foundation stage. No live signal engine is claimed to be operational.
+## Current implementation
 
-## Non-negotiable data integrity
+- Binance Spot public REST klines and WebSocket updates for BTC, ETH, SOL, BNB and XRP.
+- Candlestick chart with selectable intervals.
+- EMA 20/50, RSI 14, MACD, Bollinger Bands and ATR.
+- Validated market-structure observations and a deterministic confluence research evaluator.
+- Manual position sizing, risk budget, target-R, fee and slippage calculator.
+- Automated unit tests and TypeScript/Vite build in GitHub Actions.
+- Capacitor Android wrapper configuration and automated Android Debug APK workflow.
+
+## Build locally
+
+Requirements: Node.js 20+, npm, and Java 17 + Android SDK for Android packaging.
+
+```bash
+npm install
+npm test
+npm run build
+```
+
+## Build Android APK
+
+```bash
+npm install
+npm run build
+npx cap add android
+npx cap sync android
+cd android
+./gradlew assembleDebug
+```
+
+The debug APK is generated at `android/app/build/outputs/apk/debug/app-debug.apk`.
+
+Every push to `main` runs the web tests/build and the Android Debug APK workflow. Download the generated `TRD-Pro-Android-debug` artifact from the successful GitHub Actions run. The artifact is a debug build, not a Play Store release-signed APK.
+
+## Data integrity
 
 - Never fabricate, interpolate, or relabel sample data as live market data.
-- Every observation must retain source, instrument, market type, timeframe, event time, receive time, and validation status.
-- Reject stale, malformed, incomplete, or out-of-order data.
-- If a trusted feed is unavailable, show **NO DATA** or **NO SIGNAL**.
-- OTC feeds must be explicitly identified and never represented as official broker prices without authorization and verification.
-- Strategy scores are not win probabilities. Performance claims require reproducible out-of-sample testing.
+- If a verified feed is unavailable, show NO DATA / NO SIGNAL.
+- OTC is unsupported until an authorized, verifiable provider is integrated. No official Quotex API/feed is claimed.
+- Strategy confluence is a rule count, not win probability or a profitability claim.
+- Risk calculations are estimates and do not place orders.
 
-## Planned capabilities
+## Security and limitations
 
-- Crypto market data through documented exchange APIs and WebSocket feeds.
-- OTC provider adapters only where access, terms, provenance, and data quality can be verified.
-- Candlestick and multi-timeframe analysis.
-- Technical indicators, price action, market structure, and configurable strategy confluence.
-- Risk/reward tools, backtesting, and trade journaling.
-- AI-assisted chart explanation using user-configured providers or local models.
-- Responsive web/PWA foundation, with Android and desktop delivery planned.
+No exchange account API keys are required for public Binance Spot market data. Do not commit secrets. The app is analysis-only and does not execute broker orders. The risk calculator requires user-entered hypothetical account and trade values; it does not connect to a wallet or brokerage account.
 
-## Architecture and policies
+## Roadmap
 
-- [Architecture](docs/ARCHITECTURE.md)
-- [Data Integrity](docs/DATA-INTEGRITY.md)
-- [Roadmap](docs/ROADMAP.md)
-- [Security Policy](SECURITY.md)
-
-## Security
-
-Never commit API keys, tokens, passwords, private account data, or production secrets. Use environment variables and deployment secret stores. Market-data credentials should be read-only where possible.
-
-## Development status
-
-The initial React + Vite + TypeScript dashboard scaffold is now committed. The UI includes responsive navigation, crypto/OTC workspace switching, timeframe controls, watchlist selection, data-source entry points, signal gating, and AI analyst placeholders. No market feed or signal engine is connected yet; the interface intentionally displays NO DATA until a verified provider adapter is implemented.
+See [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Disclaimer
 
-TRD Pro is analytical software, not financial advice. Trading involves substantial risk, including loss of capital. Signals and indicators can be wrong. Users are responsible for independent verification and decisions.
+TRD Pro is analytical software, not financial advice. Trading involves substantial risk, including loss of capital. Users must independently verify all information and decisions.
