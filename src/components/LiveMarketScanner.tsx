@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Activity, AlertTriangle, Play, RefreshCw, ShieldCheck, TrendingDown, TrendingUp } from "lucide-react";
 import { evaluateStrategy, type StrategyAnalysis } from "../market/strategyEngine";
 import type { Candle, MarketInterval } from "../market/types";
@@ -43,6 +43,7 @@ export function LiveMarketScanner() {
   const [busy, setBusy] = useState(false);
   const [lastScan, setLastScan] = useState<number | null>(null);
   const [error, setError] = useState("");
+  const [continuous, setContinuous] = useState(false);
   const runScan = async () => {
     if (busy) return;
     setBusy(true); setError("");
@@ -55,15 +56,16 @@ export function LiveMarketScanner() {
       if (results.every(r => r.error)) setError("No Binance market data could be verified. Check your connection and retry.");
     } finally { setBusy(false); }
   };
+  useEffect(() => { if (!continuous) return; const timer = window.setInterval(() => { void runScan(); }, 30000); return () => window.clearInterval(timer); }, [continuous, interval]);
   const signals = rows.filter(r => r.analysis && (r.analysis.direction === "BUY" || r.analysis.direction === "SELL"));
   return <section className="panel live-scanner">
     <div className="scanner-head">
       <div><div className="panel-kicker">REAL-TIME MARKET ENGINE</div><h2>Live market scanner</h2><p>Scans verified Binance Spot candles. OTC feeds are not fabricated or substituted.</p></div>
-      <span className={busy ? "scanner-state scanning" : "scanner-state"}><i/>{busy ? "SCANNING" : lastScan ? "SCAN COMPLETE" : "READY"}</span>
+      <span className={busy || continuous ? "scanner-state scanning" : "scanner-state"}><i/>{busy ? "SCANNING" : continuous ? "AUTO SCAN ON" : lastScan ? "SCAN COMPLETE" : "READY"}</span>
     </div>
     <div className="scanner-controls">
       <label>Timeframe<select value={interval} onChange={e=>setInterval(e.target.value as MarketInterval)} disabled={busy}>{INTERVALS.map(v=><option key={v} value={v}>{v}</option>)}</select></label>
-      <button className="scanner-run" onClick={runScan} disabled={busy}>{busy ? <RefreshCw className="spin" size={16}/> : <Play size={16}/>} {busy ? "Scanning live markets..." : rows.length ? "Scan again" : "Start live scan"}</button>
+      <button className="scanner-run" onClick={runScan} disabled={busy}>{busy ? <RefreshCw className="spin" size={16}/> : <Play size={16}/>} {busy ? "Scanning live markets..." : rows.length ? "Scan now" : "Start live scan"}</button><button className="scanner-auto" onClick={()=>setContinuous(v=>!v)} disabled={busy}>{continuous ? "Pause auto scan" : "Auto scan · 30s"}</button>
       <span className="scanner-count">{signals.length} directional candidates / {rows.length} markets</span>
     </div>
     {error && <div className="scanner-error"><AlertTriangle size={15}/>{error}</div>}
