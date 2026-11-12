@@ -59,7 +59,7 @@ function clusterLevels(points: SwingPoint[], kind: "HIGH" | "LOW", tolerance: nu
 export function analyzeMarketStructure(candles: Candle[], atrValue: number | null): StructureSnapshot {
   const swings = findSwingPoints(candles);
   if (candles.length < 20 || swings.length < 2) {
-    return { swings, support: [], resistance: [], bos: null, choch: null, fvg: null, liquiditySweep: null };
+    return { swings, support: [], resistance: [], bos: null, choch: null, fvg, liquiditySweep: null };
   }
 
   const tolerance = Math.max((atrValue ?? 0) * 0.15, candles[candles.length - 1].close * 0.0005);
