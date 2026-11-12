@@ -115,7 +115,7 @@ export function evaluateStrategy(input: StrategyInput): StrategyAnalysis {
     reason: direction === "WAIT" ? "No directional setup passed the configured confluence threshold." : "Directional candidate only; execution levels and independent validation are not yet implemented.",
     reasons,
     confluenceScore,
-    confluenceMaximum: 6,
+    confluenceMaximum: 5,
     scoreIsProbability: false,
     source: "BINANCE_SPOT",
     symbol: input.symbol,
