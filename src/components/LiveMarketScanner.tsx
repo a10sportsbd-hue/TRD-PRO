@@ -23,7 +23,7 @@ async function scanSymbol(symbol: string, interval: MarketInterval): Promise<Sca
       low: Number(k[3]),
       close: Number(k[4]),
       volume: Number(k[5]),
-      source: "BINANCE_SPOT",
+      source: "BINANCE_SPOT" as const,
       receivedAt: now,
       closed: closeTime < now,
     };
