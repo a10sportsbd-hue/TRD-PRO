@@ -5,6 +5,7 @@ import type { MarketInterval } from "./market/types";
 import { calculateIndicators, formatIndicator } from "./market/indicators";
 import { useBinanceTicker } from "./market/useBinanceTicker";
 import { evaluateStrategy } from "./market/strategyEngine";
+import { RiskCalculator } from "./components/RiskCalculator";
 import {
   Activity, ArrowUpRight, Bell, BookOpen, ChartCandlestick,
   ChevronDown, Command, Compass, Cpu, Crosshair, LayoutDashboard,
@@ -249,6 +250,8 @@ function App() {
               <button className="text-action" onClick={() => setActiveNav("AI Analyst")}>Explore AI analyst <ArrowUpRight size={14} /></button>
             </div>
           </section>
+
+          <section className="panel risk-panel"><RiskCalculator /></section>
 
           <footer className="app-footer">
             <span>TRD PRO <b>v0.1.0</b></span>
