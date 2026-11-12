@@ -58,6 +58,14 @@ function clusterLevels(points: SwingPoint[], kind: "HIGH" | "LOW", tolerance: nu
 
 export function analyzeMarketStructure(candles: Candle[], atrValue: number | null): StructureSnapshot {
   const swings = findSwingPoints(candles);
+  let fvg: StructureSnapshot["fvg"] = null;
+  if (candles.length >= 3) {
+    const a = candles[candles.length - 3];
+    const c = candles[candles.length - 1];
+    if (c.low > a.high) fvg = { direction: "BULLISH", low: a.high, high: c.low, index: candles.length - 1 };
+    else if (c.high < a.low) fvg = { direction: "BEARISH", low: c.high, high: a.low, index: candles.length - 1 };
+  }
+
   if (candles.length < 20 || swings.length < 2) {
     return { swings, support: [], resistance: [], bos: null, choch: null, fvg, liquiditySweep: null };
   }
@@ -81,14 +89,6 @@ export function analyzeMarketStructure(candles: Candle[], atrValue: number | nul
     : null;
   const breakDirection = bullishBreak ? "BULLISH" : bearishBreak ? "BEARISH" : null;
   const choch = breakDirection && previousBias && breakDirection !== previousBias ? breakDirection : null;
-
-  let fvg: StructureSnapshot["fvg"] = null;
-  if (candles.length >= 3) {
-    const a = candles[candles.length - 3];
-    const c = candles[candles.length - 1];
-    if (c.low > a.high) fvg = { direction: "BULLISH", low: a.high, high: c.low, index: candles.length - 1 };
-    else if (c.high < a.low) fvg = { direction: "BEARISH", low: c.high, high: a.low, index: candles.length - 1 };
-  }
 
   let liquiditySweep: StructureSnapshot["liquiditySweep"] = null;
   if (lastHigh && latest.high > lastHigh.price && latest.close < lastHigh.price) {
