@@ -35,6 +35,7 @@ function App() {
   const marketData = useBinanceMarketData(`${activePair}USDT`, interval, marketTab === "Crypto");
   const latestCandle = marketData.candles[marketData.candles.length - 1];
   const tickerData = useBinanceTicker();
+  const selectedTicker = tickerData.items[`${activePair}USDT`];
   const indicators = calculateIndicators(marketData.candles);
   const strategy = evaluateStrategy({
     candles: marketData.candles.filter((candle) => candle.closed),
