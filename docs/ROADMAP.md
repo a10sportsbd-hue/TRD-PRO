@@ -26,7 +26,7 @@
 - [x] Initial gated confluence evaluator and explainable rejection reasons
 
 ## Phase 4 — Risk and research
-- [ ] Risk/reward and position sizing calculator
+- [x] Risk/reward and position sizing calculator
 - [ ] Backtesting with fees/slippage assumptions
 - [ ] Out-of-sample and walk-forward evaluation
 - [ ] Trade journal and performance analytics
@@ -39,7 +39,7 @@
 
 ## Phase 6 — Multi-platform and release
 - [ ] PWA installation support
-- [ ] Android packaging evaluation
+- [x] Android packaging evaluation
 - [ ] Desktop packaging evaluation
 - [ ] Security, accessibility, and performance audits
 
